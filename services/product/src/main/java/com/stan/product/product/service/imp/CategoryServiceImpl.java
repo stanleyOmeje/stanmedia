@@ -5,6 +5,7 @@ import com.stan.product.product.dto.response.CategoryDto;
 import com.stan.product.product.dto.response.DefaultResponse;
 import com.stan.product.product.entity.Category;
 import com.stan.product.product.enums.ResponseStatus;
+import com.stan.product.product.exception.AlreadyExistException;
 import com.stan.product.product.exception.BadRequestException;
 import com.stan.product.product.mapper.CategoryMapper;
 import com.stan.product.product.repository.CategoryRepository;
@@ -29,16 +30,13 @@ public class CategoryServiceImpl implements CategoryService {
         if (request.getName() == null || request.getName().isEmpty()) {
             throw new BadRequestException("Name cannot be empty");
         }
-        Category category = categoryMapper.mapCreateCategoryRequestToCategory(request);
-        try {
-            Optional<Category> categoryCheck = categoryRepository.findByName(request.getName());
-            if (categoryCheck.isPresent()) {
-                throw new IllegalArgumentException("Category with name " + request.getName() + " already exists");
-            }
-            category = categoryRepository.save(category);
-        } catch (Exception e) {
-            e.printStackTrace();
+        Optional<Category> categoryCheck = categoryRepository.findByName(request.getName());
+        if (categoryCheck.isPresent()) {
+            throw new AlreadyExistException(ResponseStatus.ALREADY_EXIST.getCode(), "Category with name " + request.getName() + ResponseStatus.ALREADY_EXIST.getMessage());
         }
+        Category category = categoryMapper.mapCreateCategoryRequestToCategory(request);
+        category = categoryRepository.save(category);
+
         CategoryDto categoryDto = categoryMapper.mapCategoryToCategoryDto(category);
         response.setStatus(ResponseStatus.SUCCESS.getCode());
         response.setMessage(ResponseStatus.SUCCESS.getMessage());

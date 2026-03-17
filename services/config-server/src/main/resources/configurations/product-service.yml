@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/ecommerce
+    url: jdbc:postgresql://localhost:5432/stanmedia
     username: postgres
     password: stan
   #    driver-class-name: org.postgresql.Driver

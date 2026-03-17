@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -18,6 +19,8 @@ public class Category {
     @NotBlank(message = "category code cannot be blank")
     private String code;
     private String description;
+    private Date createdAt;
+    private Date updatedAt;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
     private List<Product> product = new ArrayList<>();

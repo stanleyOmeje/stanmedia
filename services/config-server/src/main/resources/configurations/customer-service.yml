@@ -2,11 +2,27 @@ server:
   port: 8090
 
 spring:
-  data:
-    mongodb:
-      username: stan
-      password: stan
-      host: localhost
-      database: customer
-      authentication-database: admin
-      port: 27017
+  datasource:
+    url: jdbc:postgresql://localhost:5432/stanmedia
+    username: postgres
+    password: stan
+  #    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    database: postgresql
+
+
+#spring:
+#  data:
+#    mongodb:
+#      username: stan
+#      password: stan
+#      host: localhost
+#      database: customer
+#      authentication-database: admin
+#      uri: mongodb://stan:stan@localhost:27017/customer?authSource=admin
+#      uri: mongodb://stan:stan@mms_mongodb:27017/customer?authSource=admin
+#      port: 27017

@@ -38,16 +38,11 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/{code}")
+    @PutMapping("/{code}")
     public ResponseEntity<DefaultResponse> updateProduct(@PathVariable String code, @RequestBody UpdateProductRequest request){
         log.info("Creating product with name " + request.getName());
         DefaultResponse response = new DefaultResponse();
-        try{
-            response = productService.updateProduct(code, request);
-            return ResponseEntity.ok(response);
-        }catch (Exception e){
-            log.error(e.getMessage());
-        }
+        response = productService.updateProduct(code, request);
         return ResponseEntity.ok(response);
     }
 
@@ -82,12 +77,7 @@ public class ProductController {
     public ResponseEntity<DefaultResponse> purchaseProduct(@RequestBody List<PurchaseRequest> request){
         log.info("purchasing product with request " + request);
         DefaultResponse response = new DefaultResponse();
-        try{
-            response = productService.makePurchase(request);
-            return ResponseEntity.ok(response);
-        }catch (Exception e){
-            log.error(e.getMessage());
-        }
+        response = productService.makePurchase(request);
         return ResponseEntity.ok(response);
-    }
+   }
 }

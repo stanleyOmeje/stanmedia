@@ -12,8 +12,6 @@ import java.math.BigDecimal;
 public class UpdateProductRequest {
     private String name;
     private String description;
-    private Double availableQuantity;
-    private ProductType productType;
     private Belt belt;
     private FeeType feeType;
     private BigDecimal price;

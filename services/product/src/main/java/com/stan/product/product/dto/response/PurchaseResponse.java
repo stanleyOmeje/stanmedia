@@ -10,4 +10,6 @@ public class PurchaseResponse {
     private String description;
     private BigDecimal price;
     private String categoryName;
+    private double quantity;
+    private BigDecimal totalPrice;
 }

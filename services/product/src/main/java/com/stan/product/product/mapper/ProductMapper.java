@@ -8,6 +8,9 @@ import com.stan.product.product.entity.Category;
 import com.stan.product.product.entity.Product;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
 @Component
 public class ProductMapper {
     public ProductDto mapProductToProductDto(Product product) {
@@ -25,20 +28,21 @@ public class ProductMapper {
         product.setName(request.getName());
         product.setCode(request.getCode());
         product.setDescription(request.getDescription());
-        product.setAvailableQuantity(request.getAvailableQuantity());
-        product.setProductType(request.getProductType());
         product.setBelt(request.getBelt());
         product.setCategory(category);
+        product.setCreatedAt(new Date());
         return product;
 
     }
 
-    public PurchaseResponse mapProductToPurchaseResponse(Product product) {
+    public PurchaseResponse mapProductToPurchaseResponse(Product product, double quantity, BigDecimal amount) {
         PurchaseResponse purchaseResponse = new PurchaseResponse();
         purchaseResponse.setName(product.getName());
         purchaseResponse.setDescription(product.getDescription());
         purchaseResponse.setPrice(product.getFee().getPrice());
         purchaseResponse.setCategoryName(product.getCategory().getName());
+        purchaseResponse.setQuantity(quantity);
+        purchaseResponse.setTotalPrice(BigDecimal.valueOf(quantity).multiply(amount));
 
       return purchaseResponse;
     }

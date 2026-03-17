@@ -7,13 +7,13 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 
 public interface CustomerService {
-    ResponseEntity<String> createCustomer(@Valid CustomerRequest customerRequest);
+    DefaultResponse createCustomer(@Valid CustomerRequest customerRequest);
 
-    ResponseEntity<String> updateCustomer(String id, @Valid CustomerRequest customerRequest);
+    DefaultResponse  updateCustomer(String email, @Valid CustomerRequest customerRequest);
 
     DefaultResponse getCustomer();
 
-    public DefaultResponse<CustomerResponse> getCustomerById(String id);
+    public DefaultResponse<CustomerResponse> getCustomerById(long id);
 
-    DefaultResponse checkCustomerExistById(String id);
+    DefaultResponse checkCustomerExistById(long id);
 }

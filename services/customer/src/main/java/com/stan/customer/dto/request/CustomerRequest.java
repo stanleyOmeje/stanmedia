@@ -12,6 +12,8 @@ public record CustomerRequest(
     String lastName,
     @Email(message = "Email not valid")
     String email,
-    Address address
+    String street,
+    String houseNumber,
+    String zipCode
 ) {
 }

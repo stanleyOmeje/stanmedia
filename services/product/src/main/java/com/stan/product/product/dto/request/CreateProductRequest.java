@@ -15,8 +15,6 @@ public class CreateProductRequest {
     @NotBlank(message = "product code cannot be blank")
     private String code;
     private String description;
-    private long availableQuantity;
-    private ProductType productType;
     private Belt belt;
     private FeeType feeType;
     private BigDecimal price;

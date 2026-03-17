@@ -7,6 +7,9 @@ import com.stan.product.product.dto.response.PurchaseResponse;
 import com.stan.product.product.entity.Category;
 import com.stan.product.product.entity.FeeMapping;
 import com.stan.product.product.entity.Product;
+import com.stan.product.product.enums.Belt;
+import com.stan.product.product.enums.FeeType;
+import com.stan.product.product.enums.ProductType;
 import com.stan.product.product.enums.ResponseStatus;
 import com.stan.product.product.exception.BadRequestException;
 import com.stan.product.product.exception.NotFoundException;
@@ -22,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -35,9 +39,9 @@ public class ProductServiceImpl implements ProductService {
     private final ProductQueryService productQueryService;
 
     @Override
-    public DefaultResponse createProduct(CreateProductRequest request) {
+    public DefaultResponse<?> createProduct(CreateProductRequest request) {
         log.info("Creating product with name " + request.getName());
-        DefaultResponse response = new DefaultResponse();
+        DefaultResponse<Product> response = new DefaultResponse<>();
         String categoryCode = request.getCategoryCode();
         String productCode = request.getCode();
         if (StringUtils.isEmpty(categoryCode) || StringUtils.isEmpty(productCode)) {
@@ -82,14 +86,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public DefaultResponse fetchAllProductWithFilter(int page, int pageSize, ProductSearchCriteria productSearchCriteria) {
+    public DefaultResponse<?> fetchAllProductWithFilter(int page, int pageSize, ProductSearchCriteria productSearchCriteria) {
         log.info("Inside ProductServiceImpl::fetchAllProductWithFilter");
         ProductPage productPage = new ProductPage();
         productPage.setPageNo(page);
         productPage.setPageSize(pageSize);
 
         Page<Product> products = productQueryService.getAllProductWithFilter(productPage, productSearchCriteria);
-        DefaultResponse defaultResponse = new DefaultResponse();
+        DefaultResponse<Map<String, Object>> defaultResponse = new DefaultResponse<>();
 
         if (productPage.getPageSize() > 50) {
             defaultResponse.setMessage("Maximum page size exceeded");
@@ -108,10 +112,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public DefaultResponse updateProduct(String code, UpdateProductRequest request) {
+    public DefaultResponse<?> updateProduct(String code, UpdateProductRequest request) {
         log.info("Inside ProductServiceImpl::updateProduct with code: {}", code);
 
-        DefaultResponse response = new DefaultResponse();
+        DefaultResponse<Product> response = new DefaultResponse<>();
 
         try {
             // Null check for request
@@ -136,14 +140,17 @@ public class ProductServiceImpl implements ProductService {
             // Update fields (only if request values are not null)
             if (request.getName() != null) product.setName(request.getName());
             if (request.getDescription() != null) product.setDescription(request.getDescription());
-            if (request.getAvailableQuantity() != null) product.setAvailableQuantity(request.getAvailableQuantity());
-            if (request.getProductType() != null) product.setProductType(request.getProductType());
             if (request.getBelt() != null) product.setBelt(request.getBelt());
+
+            product.setUpdatedAt(new Date());
 
             product.setCategory(category);
 
             // Save product
             Product savedProduct = productRepository.save(product);
+
+            FeeMapping feeMapping = updateFeeMapping(request, product);
+            savedProduct.setFee(feeMapping);
 
             response.setStatus(ResponseStatus.SUCCESS.getCode());
             response.setMessage(ResponseStatus.SUCCESS.getMessage());
@@ -164,51 +171,80 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    @Override
-    public DefaultResponse makePurchase(List<PurchaseRequest> request) {
-        log.info("Inside ProductServiceImpl::makePurchase with request: {}", request);
-        DefaultResponse response = new DefaultResponse();
+    public FeeMapping updateFeeMapping(UpdateProductRequest request, Product product) {
+        log.info("updating FeeMapping with name ");
         try {
-            //Get all the productCodes(requestProductCodes)
-            List<String> requestProductCodes = request
-                .stream()
-                .map(PurchaseRequest::getProductCode)
-                .toList();
-            //Find from db if all the product are available, order by code
-            List<Product> storedRequestProduct = productRepository.findByCodeInOrderByCode(requestProductCodes);
-            if (storedRequestProduct.size() != requestProductCodes.size()) {
-                throw new BadRequestException("Product code list does not match availavle product code list");
+            Optional<FeeMapping> feeMappingCheck = feeMappingRepository.findOneByProduct(product);
+            if (feeMappingCheck.isEmpty()) {
+                throw new NotFoundException("FeeMapping not found");
             }
-            //sort the request
-            var sortedStoredPurchaseRequest = request
-                .stream()
-                .sorted(Comparator.comparing(PurchaseRequest::getProductCode))
-                .toList();
-            //loop through the storedRequestProduct, check if required quantity is available
-            List<PurchaseResponse> purchaseResponses = new ArrayList<>();
-            for (int i = 0; i < storedRequestProduct.size(); i++) {
-                var product = storedRequestProduct.get(i);
-                var purchaseRequest = sortedStoredPurchaseRequest.get(i);
-                if (product.getAvailableQuantity() < purchaseRequest.getQuantity()) {
-                    throw new BadRequestException("Product available quantity exceeded");
-                }
-                // decrease the available quantity
-                double remainingQuantity = product.getAvailableQuantity() - purchaseRequest.getQuantity();
-                product.setAvailableQuantity(remainingQuantity);
-                productRepository.save(product);
-                PurchaseResponse purchaseResponse = productMapper.mapProductToPurchaseResponse(product);
-                purchaseResponses.add(purchaseResponse);
-            }
-            response.setStatus(ResponseStatus.SUCCESS.getCode());
-            response.setMessage(ResponseStatus.SUCCESS.getMessage());
-            response.setData(purchaseResponses);
-            log.info("response...{}",response);
-            return response;
+            FeeMapping feeMapping = feeMappingCheck.get();
+            feeMapping.setFeeType(request.getFeeType());
+            feeMapping.setPrice(request.getPrice());
+            feeMapping.setProduct(product);
+            feeMapping = feeMappingRepository.save(feeMapping);
+            return feeMapping;
         } catch (Exception e) {
-            response.setStatus(ResponseStatus.FAILED.getCode());
-            response.setMessage(e.getMessage());
-            return response;
+            log.error(e.getMessage());
+        }
+        return null;
+    }
+
+    @Override
+    public DefaultResponse<?> makePurchase(List<PurchaseRequest> request) {
+        log.info("Inside ProductServiceImpl::makePurchase with request: {}", request);
+        if (request == null || request.isEmpty()) {
+            throw new BadRequestException("Request body cannot be empty");
+        }
+        List<PurchaseResponse> purchaseResponses = new ArrayList<>();
+        for (PurchaseRequest purchaseRequest : request) {
+            String productCode = purchaseRequest.getProductCode();
+            Product product = productRepository.findByCode(productCode)
+                .orElseThrow(() -> new BadRequestException("Invalid product code: " + productCode));
+            if (product.getFee() != null) {
+                if (!FeeType.Dynamic.equals(product.getFee().getFeeType())) {
+                    validateAmount(purchaseRequest.getAmount(), product);
+                }
+            }
+            Category category = product.getCategory();
+            if (category != null &&
+                !ProductType.JINGLE.name().equalsIgnoreCase(category.getCode())) {
+                boolean timeAvailable = checkTimeAvailability(product.getBelt());
+                if (!timeAvailable) {
+                    throw new BadRequestException("Product belt is not available");
+                }
+            }
+            PurchaseResponse purchaseResponse =
+                productMapper.mapProductToPurchaseResponse(product, purchaseRequest.getQuantity(), purchaseRequest.getAmount());
+
+            purchaseResponses.add(purchaseResponse);
+        }
+
+        DefaultResponse<List<PurchaseResponse>> response = new DefaultResponse<>();
+        response.setStatus(ResponseStatus.SUCCESS.getCode());
+        response.setMessage(ResponseStatus.SUCCESS.getMessage());
+        response.setData(purchaseResponses);
+
+        log.info("response...{}", response);
+
+        return response;
+    }
+
+    private boolean checkTimeAvailability(Belt belt) {
+        return true;
+    }
+
+
+    private void validateAmount(BigDecimal amount, Product product) {
+        FeeMapping fee = product.getFee();
+        if (fee == null) {
+            throw new BadRequestException("Fee mapping not ");
+        }
+        if (amount.compareTo(fee.getPrice()) != 0) {
+            throw new BadRequestException("Amount not valid");
         }
     }
+
+
 
 }

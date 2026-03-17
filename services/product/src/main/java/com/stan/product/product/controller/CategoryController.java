@@ -4,9 +4,12 @@ package com.stan.product.product.controller;
 import com.stan.product.product.config.ApplicationUrl;
 import com.stan.product.product.dto.request.CreateCategoryRequest;
 import com.stan.product.product.dto.response.DefaultResponse;
+import com.stan.product.product.enums.ResponseStatus;
+import com.stan.product.product.exception.AlreadyExistException;
 import com.stan.product.product.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,14 +25,8 @@ public class CategoryController {
 
     @PostMapping
     public ResponseEntity<DefaultResponse<?>> createCategory(@RequestBody CreateCategoryRequest request
-                                                             ) {
-        DefaultResponse<?> response = new DefaultResponse<>();
-        try {
-            response = categoryService.createCategory(request);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
+    ) {
+        DefaultResponse<?> response = categoryService.createCategory(request);
         return ResponseEntity.ok(response);
     }
 
