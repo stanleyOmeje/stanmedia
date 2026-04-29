@@ -74,7 +74,7 @@ public class ProductQueryService {
             predicates.add(criteriaBuilder.equal(productRoot.get("fee").get("feeType"), searchCriteria.getFeeType()));
         }
         if (Objects.nonNull(searchCriteria.getPrice())) {
-            predicates.add(criteriaBuilder.equal(productRoot.get("fee").get("price"), searchCriteria.getFeeType()));
+            predicates.add(criteriaBuilder.equal(productRoot.get("fee").get("price"), searchCriteria.getPrice()));
         }
 
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

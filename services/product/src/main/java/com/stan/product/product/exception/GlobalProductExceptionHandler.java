@@ -36,21 +36,21 @@ public class GlobalProductExceptionHandler extends ResponseEntityExceptionHandle
         return new ResponseEntity<>(new DefaultResponse(ex.getMessage(), ex.getCode()), new HttpHeaders(), HttpStatus.OK);
     }
 
-//    @ResponseStatus(HttpStatus.OK)
-//    @ExceptionHandler
-//    public ResponseEntity<Object> handleUnknownException(UnknownException ex, WebRequest request) {
-//        return new ResponseEntity<>(new DefaultResponse(ex.getMessage(), ex.getCode()), new HttpHeaders(), HttpStatus.OK);
-//    }
+////    @ResponseStatus(HttpStatus.OK)
+////    @ExceptionHandler
+////    public ResponseEntity<Object> handleUnknownException(UnknownException ex, WebRequest request) {
+////        return new ResponseEntity<>(new DefaultResponse(ex.getMessage(), ex.getCode()), new HttpHeaders(), HttpStatus.OK);
+////    }
+////
+////    @ResponseStatus(HttpStatus.OK)
+////    @ExceptionHandler
+////    public ResponseEntity<Object> handleGenericAppException(GenericAppException ex, WebRequest request) {
+////        return new ResponseEntity<>(new DefaultResponse(ex.getMessage(), ex.getStatusCode()), new HttpHeaders(), HttpStatus.OK);
+////    }
 //
 //    @ResponseStatus(HttpStatus.OK)
-//    @ExceptionHandler
-//    public ResponseEntity<Object> handleGenericAppException(GenericAppException ex, WebRequest request) {
-//        return new ResponseEntity<>(new DefaultResponse(ex.getMessage(), ex.getStatusCode()), new HttpHeaders(), HttpStatus.OK);
+//    @ExceptionHandler(NullPointerException.class)
+//    public ResponseEntity<Object> handleGenericAppException(NullPointerException ex, WebRequest request) {
+//        return new ResponseEntity<>(new DefaultResponse("System Malfunction", "77"), new HttpHeaders(), HttpStatus.OK);
 //    }
-
-    @ResponseStatus(HttpStatus.OK)
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<Object> handleGenericAppException(NullPointerException ex, WebRequest request) {
-        return new ResponseEntity<>(new DefaultResponse("System Malfunction", "77"), new HttpHeaders(), HttpStatus.OK);
-    }
 }

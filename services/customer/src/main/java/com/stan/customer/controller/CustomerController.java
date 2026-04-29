@@ -26,7 +26,7 @@ public class CustomerController {
     @PutMapping("/{id}")
     public ResponseEntity<DefaultResponse<?>> updateCustomer(@PathVariable String id,
                                                  @RequestBody @Valid CustomerRequest customerRequest) {
-        log.info("Inside Customer Controller :: createCustomer with request ...{}", customerRequest);
+        log.info("Inside Customer Controller :: updateCustomer with request ...{}", customerRequest);
         DefaultResponse response = customerService.updateCustomer(id,customerRequest);
         return ResponseEntity.ok(response);
 

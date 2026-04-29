@@ -43,12 +43,17 @@ public class CustomerServiceImpl implements CustomerService {
             Customer customer = customerRepository.save(customerMapper.mapCustomerRequestToCustomer(customerRequest));
             Address address = createAddress(customerRequest, customer);
             customer.setAddress(address);
+            customerRepository.save(customer);
             response.setStatus(ResponseStatus.CREATED.getCode());
             response.setMessage(ResponseStatus.CREATED.getMessage());
             response.setData(customer);
             log.info("response...{}", response);
             return response;
-        } catch (Exception e) {
+        } catch (AlreadyExistException e){
+            throw new AlreadyExistException(ResponseStatus.ALREADY_EXIST.getCode(), "Customer "+
+                ResponseStatus.ALREADY_EXIST.getMessage());
+        }
+        catch (Exception e) {
             log.info(e.getMessage());
         }
         return null;
@@ -61,6 +66,7 @@ public class CustomerServiceImpl implements CustomerService {
             address.setStreet(customerRequest.street());
             address.setHouseNumber(customerRequest.houseNumber());
             address.setZipCode(customerRequest.zipCode());
+            address.setCreatedAt(new Date());
             address.setCustomer(customer);
             address = addressRepository.save(address);
             return address;
@@ -74,6 +80,8 @@ public class CustomerServiceImpl implements CustomerService {
     public DefaultResponse<?> updateCustomer(String email, CustomerRequest request) {
         log.info("Inside CustomerServiceImpl::updateCustomer with request " + request);
         DefaultResponse<Customer> response = new DefaultResponse<>();
+        response.setStatus(ResponseStatus.FAILED.getCode());
+        response.setMessage(ResponseStatus.FAILED.getMessage());
         try {
             Optional<Customer> optionalCustomer = customerRepository.findByEmail(email);
             if (optionalCustomer.isPresent()) {
@@ -93,11 +101,15 @@ public class CustomerServiceImpl implements CustomerService {
 
                 log.info("response...{}", response);
                 return response;
+            }else {
+                response.setStatus(ResponseStatus.NOT_FOUND.getCode());
+                response.setMessage(ResponseStatus.NOT_FOUND.getMessage());
+                return response;
             }
         } catch (Exception e) {
             log.info(e.getMessage());
         }
-        return null;
+        return response;
     }
 
 

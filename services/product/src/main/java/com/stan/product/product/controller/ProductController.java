@@ -26,15 +26,9 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
     @PostMapping
-    public ResponseEntity<DefaultResponse> createProduct(@RequestBody CreateProductRequest request){
+    public ResponseEntity<DefaultResponse> createProduct(@RequestBody CreateProductRequest request) {
         log.info("Creating product with name " + request.getName());
-        DefaultResponse response = new DefaultResponse();
-        try{
-            response = productService.createProduct(request);
-            return ResponseEntity.ok(response);
-        }catch (Exception e){
-            log.error(e.getMessage());
-        }
+        DefaultResponse response = productService.createProduct(request);
         return ResponseEntity.ok(response);
     }
 

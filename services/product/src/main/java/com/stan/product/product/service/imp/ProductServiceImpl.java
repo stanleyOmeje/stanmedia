@@ -238,10 +238,10 @@ public class ProductServiceImpl implements ProductService {
     private void validateAmount(BigDecimal amount, Product product) {
         FeeMapping fee = product.getFee();
         if (fee == null) {
-            throw new BadRequestException("Fee mapping not ");
+            throw new BadRequestException("Fee mapping not Present");
         }
         if (amount.compareTo(fee.getPrice()) != 0) {
-            throw new BadRequestException("Amount not valid");
+            throw new BadRequestException("Amount not valid for "+product.getCode()+". Valid amount is "+fee.getPrice());
         }
     }
 
