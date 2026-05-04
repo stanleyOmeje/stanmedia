@@ -32,7 +32,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
         Optional<Category> categoryCheck = categoryRepository.findByName(request.getName());
         if (categoryCheck.isPresent()) {
-            throw new AlreadyExistException(ResponseStatus.ALREADY_EXIST.getCode(), "Category with name " + request.getName() + ResponseStatus.ALREADY_EXIST.getMessage());
+            throw new AlreadyExistException(ResponseStatus.ALREADY_EXIST.getCode(), "Category with name " + request.getName() +" "+ ResponseStatus.ALREADY_EXIST.getMessage());
         }
         Category category = categoryMapper.mapCreateCategoryRequestToCategory(request);
         category = categoryRepository.save(category);

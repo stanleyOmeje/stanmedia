@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/customer")
+@RequestMapping("/api/v1/customers")
 public class CustomerController {
     private final CustomerService customerService;
     @PostMapping
@@ -23,11 +23,11 @@ public class CustomerController {
       return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<DefaultResponse<?>> updateCustomer(@PathVariable String id,
+    @PutMapping("/{email}")
+    public ResponseEntity<DefaultResponse<?>> updateCustomer(@PathVariable String email,
                                                  @RequestBody @Valid CustomerRequest customerRequest) {
         log.info("Inside Customer Controller :: updateCustomer with request ...{}", customerRequest);
-        DefaultResponse response = customerService.updateCustomer(id,customerRequest);
+        DefaultResponse response = customerService.updateCustomer(email,customerRequest);
         return ResponseEntity.ok(response);
 
     }

@@ -88,7 +88,7 @@ public class CustomerServiceImpl implements CustomerService {
                 Customer customer = optionalCustomer.get();
                 customer.setFirstName(request.firstName());
                 customer.setLastName(request.lastName());
-                customer.setEmail(request.email());
+               // customer.setEmail(request.email());
                 customer.setUpdatedAt(new Date());
 
                 Address address = updateAddress(request, customer);
@@ -174,6 +174,10 @@ public class CustomerServiceImpl implements CustomerService {
                 defaultResponse.setData(customerResponse);
 
                 log.info("response...{}", defaultResponse);
+                return defaultResponse;
+            }else {
+                defaultResponse.setStatus(ResponseStatus.NOT_FOUND.getCode());
+                defaultResponse.setMessage(ResponseStatus.NOT_FOUND.getMessage());
                 return defaultResponse;
             }
         } catch (Exception e) {

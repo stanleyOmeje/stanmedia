@@ -1,0 +1,35 @@
+spring:
+  kafka:
+    admin:
+      auto-create: true
+    bootstrap-servers: localhost:9092
+
+    producer:
+      properties:
+        retries: 10
+        retry.backoff.ms: 1000
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.add.type.headers: false
+        spring.json.trusted.packages: "*"
+        spring.json.type.mapping: paymentConfirmation:com.stan.payment.kafka.PaymentNotificationRequest
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/stanmedia
+    username: postgres
+    password: stan
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    database: postgresql
+
+
+server:
+  port: 8093
