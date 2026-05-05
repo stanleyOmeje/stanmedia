@@ -8,11 +8,10 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record OrderRequest(
-    long id,
-    String reference,
+//    String reference,
     BigDecimal amount,
     PaymentMethod paymentMethod,
-    Long customerId,
+    String email,
     List<PurchaseRequest> purchaseRequest
 ) {
 }

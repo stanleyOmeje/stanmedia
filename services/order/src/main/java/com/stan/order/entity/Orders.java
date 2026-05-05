@@ -23,8 +23,9 @@ public class Orders {
 
     private String reference;
     private BigDecimal totalPrice;
+    @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
-    private Long customerId;
+    private String customerEmail;
     @OneToMany
     private List<Orderline> orderline;
     private LocalDateTime createdAt;

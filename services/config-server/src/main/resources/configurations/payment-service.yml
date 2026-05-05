@@ -30,6 +30,11 @@ spring:
     show-sql: true
     database: postgresql
 
+app:
+  config:
+    customer-url: http://localhost:8222/api/v1/customers
+    order-url: http://localhost:8222/api/v1/orders
+    product-url: http://localhost:8222/api/v1/products
 
 server:
   port: 8093

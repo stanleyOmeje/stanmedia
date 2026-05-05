@@ -16,4 +16,6 @@ public interface CustomerService {
     public DefaultResponse<CustomerResponse> getCustomerById(long id);
 
     DefaultResponse checkCustomerExistById(long id);
+
+    DefaultResponse getCustomerByEmail(String email);
 }

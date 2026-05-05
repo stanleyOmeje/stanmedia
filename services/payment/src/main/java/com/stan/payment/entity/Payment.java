@@ -1,10 +1,7 @@
 package com.stan.payment.entity;
 
 import com.stan.payment.enums.PaymentMethod;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,8 +17,10 @@ public class Payment {
     private Long id;
 
     private BigDecimal amount;
+    @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
     private long orderId;
+    private String paymentReference;
     private LocalDateTime createdDate;
     private LocalDateTime lastModifiedDate;
 

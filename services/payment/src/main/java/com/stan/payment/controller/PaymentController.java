@@ -1,6 +1,8 @@
 package com.stan.payment.controller;
 
 import com.stan.payment.dto.request.PaymentRequest;
+import com.stan.payment.dto.response.CreatePaymentResponse;
+import com.stan.payment.dto.response.DefaultResponse;
 import com.stan.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +17,7 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping
-    public ResponseEntity<Long> makePayment(@RequestBody PaymentRequest paymentRequest) {
+    public ResponseEntity<DefaultResponse<CreatePaymentResponse>> makePayment(@RequestBody PaymentRequest paymentRequest) {
         log.info("Inside PaymentController::makePayment with request: {}", paymentRequest);
         return ResponseEntity.ok(paymentService.makePayment(paymentRequest));
     }

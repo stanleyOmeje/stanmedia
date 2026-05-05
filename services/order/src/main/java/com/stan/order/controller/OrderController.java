@@ -4,7 +4,10 @@ import com.stan.order.customerHelper.CustomerClient;
 import com.stan.order.dto.request.OrderRequest;
 import com.stan.order.dto.request.OrderlineRequest;
 import com.stan.order.dto.request.PurchaseRequest;
+import com.stan.order.dto.response.CreateOrderResponse;
+import com.stan.order.dto.response.DefaultResponse;
 import com.stan.order.dto.response.OrderResponse;
+import com.stan.order.enums.ResponseStatus;
 import com.stan.order.exceptions.NotFoundException;
 import com.stan.order.kafka.OrderConfirmation;
 import com.stan.order.kafka.OrderProducer;
@@ -39,11 +42,12 @@ public class OrderController {
 
 
     @PostMapping
-    public ResponseEntity<String> createOrder(@RequestBody OrderRequest request) {
+    public ResponseEntity<DefaultResponse<CreateOrderResponse>> createOrder(@RequestBody OrderRequest request) {
+        DefaultResponse<CreateOrderResponse> response = new DefaultResponse<CreateOrderResponse>();
         log.info("Inside OrderController::createOrder Creating order with request {}", request);
 
         //check customer
-        var defaultCustomer = customerClient.getCustomerById(request.customerId()).orElseThrow(
+        var defaultCustomer = customerClient.getCustomerByEmail(request.email()).orElseThrow(
             () -> new NotFoundException("01", "Customer not found")
         );
         if (!"00".equals(defaultCustomer.getStatus()) || defaultCustomer.getData() == null) {
@@ -72,32 +76,44 @@ public class OrderController {
             request.amount(),
             request.paymentMethod(),
             order.getId(),
-            request.reference(),
+            order.getReference(),
             customer
         );
-        paymentClient.makePayment(paymentRequest);
+        var paymentResponse = paymentClient.makePayment(paymentRequest);
+        log.info("paymentResponse ...{}", paymentResponse);
 
         //send order confirmation notification
         orderProducer.sendOrderConfirmation(new OrderConfirmation(
-            request.reference(),
+            order.getReference(),
             request.amount(),
             request.paymentMethod(),
             customer,
             purchasedProduct.getData()
         ));
-        return ResponseEntity.ok(String.valueOf(order.getId()));
+        response.setStatus(ResponseStatus.SUCCESS.getCode());
+        response.setMessage("Order created successfully");
+        response.setData(new CreateOrderResponse(order.getReference()));
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderResponse>> getAllOrder() {
+    public ResponseEntity<DefaultResponse<List<OrderResponse>>> getAllOrder() {
         log.info("Inside OrderController::getAllOrder getting orders");
         return ResponseEntity.ok(orderService.getAllOrder());
     }
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponse> getOrderById(@PathVariable("id") Long id) {
+    public ResponseEntity<DefaultResponse<OrderResponse>> getOrderById(@PathVariable("id") Long id) {
         log.info("Inside OrderController::getOrderById getting single orders");
         return ResponseEntity.ok(orderService.getOrderById(id));
+    }
+
+
+
+    @GetMapping("/order-reference/{orderReference}")
+    public ResponseEntity<DefaultResponse<OrderResponse>> getOrderByOrderReferce(@PathVariable("orderReference") String orderReference) {
+        log.info("Inside OrderController::getOrderByOrderReferce getting single orders");
+        return ResponseEntity.ok(orderService.getOrderByOrderReferce(orderReference));
     }
 }

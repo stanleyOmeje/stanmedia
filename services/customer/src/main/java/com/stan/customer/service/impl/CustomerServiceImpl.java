@@ -217,4 +217,32 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("response...{}", defaultResponse);
         return defaultResponse;
     }
+
+    @Override
+    public DefaultResponse<CustomerResponse> getCustomerByEmail(String email) {
+        log.info("Inside CustomerServiceImpl::getCustomerById  ");
+        DefaultResponse<CustomerResponse> defaultResponse = new DefaultResponse<>();
+        try {
+            Optional<Customer> customer = customerRepository.findByEmail(email);
+            if (customer.isPresent()) {
+                defaultResponse.setStatus("00");
+                defaultResponse.setMessage("Success");
+                CustomerResponse customerResponse = customerMapper.mapCustomerToCustomerResponse(customer.get());
+                defaultResponse.setData(customerResponse);
+
+                log.info("response...{}", defaultResponse);
+                return defaultResponse;
+            }else {
+                defaultResponse.setStatus(ResponseStatus.NOT_FOUND.getCode());
+                defaultResponse.setMessage(ResponseStatus.NOT_FOUND.getMessage());
+                return defaultResponse;
+            }
+        } catch (Exception e) {
+            log.info(e.getMessage());
+        }
+        defaultResponse.setStatus("01");
+        defaultResponse.setMessage("Failed");
+        log.info("response...{}", defaultResponse);
+        return defaultResponse;
+    }
 }

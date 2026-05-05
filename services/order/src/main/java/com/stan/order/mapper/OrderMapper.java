@@ -4,18 +4,21 @@ package com.stan.order.mapper;
 import com.stan.order.dto.request.OrderRequest;
 import com.stan.order.dto.response.OrderResponse;
 import com.stan.order.entity.Orders;
+import com.stan.order.util.OrderUtil;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 @Component
 public class OrderMapper {
+   // private  OrderUtil orderUtil;
     public Orders mapOrderRequestToOrder(OrderRequest request){
        // var order = new Order();
         return Orders.builder()
-            .reference(request.reference())
+//            .reference(request.reference())
+            .reference(OrderUtil.generateReference(request.email()))
             .totalPrice(request.amount())
-            .customerId(request.customerId())
+            .customerEmail(request.email())
             .paymentMethod(request.paymentMethod())
             .createdAt(LocalDateTime.now())
             .build();
@@ -27,7 +30,7 @@ public class OrderMapper {
            order.getReference(),
            order.getTotalPrice(),
            order.getPaymentMethod(),
-           order.getCustomerId()
+           order.getCustomerEmail()
         );
     }
 }

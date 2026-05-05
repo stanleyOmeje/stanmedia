@@ -13,6 +13,6 @@ import java.util.Optional;
 )
 public interface CustomerClient {
 
-    @GetMapping("/{customer-id}")
-    Optional<DefaultResponse<CustomerResponse>> getCustomerById(@PathVariable("customer-id") Long id);
+    @GetMapping("/email/{email}")
+    Optional<DefaultResponse<CustomerResponse>> getCustomerByEmail(@PathVariable("email") String email);
 }

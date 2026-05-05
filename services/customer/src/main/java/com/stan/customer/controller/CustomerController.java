@@ -46,6 +46,13 @@ public class CustomerController {
         return ResponseEntity.ok(defaultResponse);
     }
 
+    @GetMapping("/email/{email}")
+    public ResponseEntity<DefaultResponse<?>> getCustomerByEmail(@PathVariable String email) {
+        log.info("Inside Customer Controller :: getCustomerByEmail with request ...{}", email);
+        DefaultResponse defaultResponse =  customerService.getCustomerByEmail(email);
+        return ResponseEntity.ok(defaultResponse);
+    }
+
     @GetMapping("/exist/{id}")
     public ResponseEntity<DefaultResponse<?>> checkCustomerExistById(@PathVariable long id) {
         log.info("Inside Customer Controller :: checkCustomerExistById with request ...{}", id);

@@ -1,6 +1,8 @@
 package com.stan.order.paymentHelper;
 
 
+import com.stan.order.dto.response.DefaultResponse;
+import com.stan.order.paymentHelper.dto.CreatePaymentResponse;
 import com.stan.order.paymentHelper.dto.PaymentRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -12,5 +14,5 @@ url = "${app.config.payment-url}")
 public interface PaymentClient {
 
     @PostMapping
-    ResponseEntity<Long> makePayment(@RequestBody PaymentRequest request);
+    ResponseEntity<DefaultResponse<CreatePaymentResponse>> makePayment(@RequestBody PaymentRequest request);
 }

@@ -1,7 +1,6 @@
-package com.stan.order.dto.response;
+package com.stan.payment.dto.orderdto.response;
 
-
-import com.stan.order.enums.PaymentMethod;
+import com.stan.payment.enums.PaymentMethod;
 
 import java.math.BigDecimal;
 
@@ -10,6 +9,6 @@ public record OrderResponse(
     String reference,
     BigDecimal amount,
     PaymentMethod paymentMethod,
-    String customerEmail
+    Long customerId
 ) {
 }
