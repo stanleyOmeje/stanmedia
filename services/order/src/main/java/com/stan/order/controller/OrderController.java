@@ -9,6 +9,7 @@ import com.stan.order.dto.response.DefaultResponse;
 import com.stan.order.dto.response.OrderResponse;
 import com.stan.order.enums.ResponseStatus;
 import com.stan.order.exceptions.NotFoundException;
+import com.stan.order.exceptions.PaymentMisMatchException;
 import com.stan.order.kafka.OrderConfirmation;
 import com.stan.order.kafka.OrderProducer;
 import com.stan.order.mapper.OrderMapper;
@@ -24,6 +25,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static com.stan.order.util.OrderUtil.validateAmount;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -57,7 +60,10 @@ public class OrderController {
 
         //purchase product
         var purchasedProduct = productHttp.purchaseProduct(request.purchaseRequest());
-        //Write a method to calculate the total amount of items
+        //Check totalAmount against sum of items amount
+        if(!validateAmount(purchasedProduct.getData().getGrandTotal(), request.amount())){
+            throw new PaymentMisMatchException(ResponseStatus.PAYMENT_FAILED.getCode(), "Amount MisMatch");
+        }
         //persist order
         var order = orderRepository.save(orderMapper.mapOrderRequestToOrder(request));
 
@@ -79,6 +85,10 @@ public class OrderController {
             order.getReference(),
             customer
         );
+        if(!validateAmount(order.getTotalPrice(), request.amount())){
+            throw new PaymentMisMatchException(ResponseStatus.PAYMENT_FAILED.getCode(),
+                ResponseStatus.PAYMENT_FAILED.getMessage());
+        }
         var paymentResponse = paymentClient.makePayment(paymentRequest);
         log.info("paymentResponse ...{}", paymentResponse);
 
@@ -88,7 +98,7 @@ public class OrderController {
             request.amount(),
             request.paymentMethod(),
             customer,
-            purchasedProduct.getData()
+            purchasedProduct.getData().getPurchaseResponses()
         ));
         response.setStatus(ResponseStatus.SUCCESS.getCode());
         response.setMessage("Order created successfully");

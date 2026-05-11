@@ -34,4 +34,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleNotAllowedException(NotAllowedException ex, WebRequest request){
         return new ResponseEntity<>(new DefaultResponse<>(ex.getCode(),ex.getMessage()),new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler
+    public ResponseEntity<Object> handlePaymentMisMatchException(PaymentMisMatchException ex, WebRequest request){
+        return new ResponseEntity<>(new DefaultResponse<>(ex.getCode(),ex.getMessage()),new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
 }

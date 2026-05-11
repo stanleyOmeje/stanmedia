@@ -3,6 +3,7 @@ package com.stan.product.product.service.imp;
 
 import com.stan.product.product.dto.request.*;
 import com.stan.product.product.dto.response.DefaultResponse;
+import com.stan.product.product.dto.response.GrandPurchaseResponse;
 import com.stan.product.product.dto.response.PurchaseResponse;
 import com.stan.product.product.entity.Category;
 import com.stan.product.product.entity.FeeMapping;
@@ -196,6 +197,7 @@ public class ProductServiceImpl implements ProductService {
         if (request == null || request.isEmpty()) {
             throw new BadRequestException("Request body cannot be empty");
         }
+        GrandPurchaseResponse grandPurchaseResponse = new GrandPurchaseResponse();
         List<PurchaseResponse> purchaseResponses = new ArrayList<>();
         for (PurchaseRequest purchaseRequest : request) {
             String productCode = purchaseRequest.getProductCode();
@@ -219,11 +221,25 @@ public class ProductServiceImpl implements ProductService {
 
             purchaseResponses.add(purchaseResponse);
         }
+//        BigDecimal grandAmount = purchaseResponses.stream()
+//                .map(tprice->tprice.getTotalPrice())
+//                    .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        DefaultResponse<List<PurchaseResponse>> response = new DefaultResponse<>();
+        BigDecimal grandAmount = purchaseResponses.stream()
+            .map(response -> response.getTotalPrice() == null
+                ? BigDecimal.ZERO
+                : response.getTotalPrice())
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        log.info("grandAmount...{}", grandAmount);
+        grandPurchaseResponse.setPurchaseResponses(purchaseResponses);
+        grandPurchaseResponse.setGrandTotal(grandAmount);
+
+//        DefaultResponse<List<PurchaseResponse>> response = new DefaultResponse<>();
+        DefaultResponse<GrandPurchaseResponse> response = new DefaultResponse<>();
         response.setStatus(ResponseStatus.SUCCESS.getCode());
         response.setMessage(ResponseStatus.SUCCESS.getMessage());
-        response.setData(purchaseResponses);
+        response.setData(grandPurchaseResponse);
 
         log.info("response...{}", response);
 
