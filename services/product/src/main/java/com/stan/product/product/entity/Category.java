@@ -3,6 +3,7 @@ package com.stan.product.product.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,5 +24,6 @@ public class Category {
     private Date updatedAt;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
+    @ToString.Exclude
     private List<Product> product = new ArrayList<>();
 }

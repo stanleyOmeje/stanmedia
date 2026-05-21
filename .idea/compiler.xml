@@ -9,12 +9,13 @@
         <outputRelativeToContentRoot value="true" />
         <module name="config-server" />
         <module name="notification" />
-        <module name="payment" />
         <module name="discovery-server" />
+        <module name="payment" />
         <module name="gateway" />
+        <module name="data-storage" />
         <module name="order" />
       </profile>
-      <profile name="Annotation profile for customer" enabled="true">
+      <profile name="Annotation profile for product" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -30,6 +31,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="config-server" options="-parameters" />
       <module name="customer" options="-parameters" />
+      <module name="data-storage" options="-parameters" />
       <module name="discovery-server" options="-parameters" />
       <module name="gateway" options="-parameters" />
       <module name="notification" options="-parameters" />

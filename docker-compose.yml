@@ -94,6 +94,35 @@ services:
       - micrroservices-net
 
 
+  redis:
+    container_name: mms_redis
+    image: redis:7.2-alpine
+    command: redis-server --requirepass stan --appendonly yes
+    environment:
+      - REDIS_PASSWORD=stan
+    volumes:
+      - redis:/data
+    ports:
+      - 6380:6379
+    networks:
+      - micrroservices-net
+    restart: unless-stopped
+
+  redis-commander:
+    container_name: mms_redis_commander
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:6379:0:stan
+    ports:
+      - 8085:8081
+    networks:
+      - micrroservices-net
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+
+
 
 networks:
   micrroservices-net:
@@ -104,3 +133,4 @@ volumes:
   postgres:
   pgadmin:
   mongo:
+  redis:

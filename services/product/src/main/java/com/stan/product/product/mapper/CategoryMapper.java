@@ -2,6 +2,7 @@ package com.stan.product.product.mapper;
 
 
 import com.stan.product.product.dto.request.CreateCategoryRequest;
+import com.stan.product.product.dto.request.UpdateCategoryRequest;
 import com.stan.product.product.dto.response.CategoryDto;
 import com.stan.product.product.entity.Category;
 import org.springframework.stereotype.Component;
@@ -27,5 +28,14 @@ public class CategoryMapper {
         categoryDto.setName(category.getName());
         categoryDto.setDescription(category.getDescription());
         return categoryDto;
+    }
+
+    public Category mapUpdateCategoryRequestToCategory(UpdateCategoryRequest request) {
+        Category category = new Category();
+        category.setName(request.getName());
+        category.setCode(request.getCode());
+        category.setDescription(request.getDescription());
+        category.setCreatedAt(new Date());
+        return category;
     }
 }

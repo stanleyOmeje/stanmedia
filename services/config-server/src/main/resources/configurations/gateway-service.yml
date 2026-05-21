@@ -35,6 +35,10 @@ spring:
               uri: lb://NOTIFICATION-SERVICE
               predicates:
                 - Path=/api/v1/notifications/**
+            - id: data-storage-service
+              uri: lb://DATA-STORAGE-SERVICE
+              predicates:
+                - Path=/api/v1/storage/**
 
 
 server:

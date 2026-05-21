@@ -1,0 +1,25 @@
+server:
+  port: 8095
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/stanmedia
+    username: postgres
+    password: stan
+  #    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    database: postgresql
+
+  data:
+    redis:
+      host: localhost
+      port: 6380
+      password: stan
+      timeout: 60000
+
+
+
