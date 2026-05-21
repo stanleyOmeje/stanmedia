@@ -57,7 +57,7 @@ public class CustomerController {
             defaultResponse.setData(customerMapper.mapCustomerRequestToCustomerResponse(customer));
             return ResponseEntity.ok(defaultResponse);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.info(e.getMessage());
             defaultResponse.setStatus("99");
             defaultResponse.setMessage(e.getMessage());
             defaultResponse.setData(null);
@@ -76,7 +76,7 @@ public class CustomerController {
             defaultResponse.setData("Customer has been deleted successfully");
             return ResponseEntity.ok(defaultResponse);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.info(e.getMessage());
             defaultResponse.setStatus("01");
             defaultResponse.setMessage(e.getMessage());
             defaultResponse.setData(null);
