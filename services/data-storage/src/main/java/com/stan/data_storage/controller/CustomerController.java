@@ -15,7 +15,7 @@ import java.time.Duration;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("api/v1/storage")
+@RequestMapping("/api/v1/storage")
 public class CustomerController {
 
     private final RedisUtility redisUtility;

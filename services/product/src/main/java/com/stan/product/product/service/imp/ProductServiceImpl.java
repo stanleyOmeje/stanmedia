@@ -78,6 +78,7 @@ public class ProductServiceImpl implements ProductService {
             feeMapping.setFeeType(request.getFeeType());
             feeMapping.setPrice(request.getPrice());
             feeMapping.setProduct(product);
+            feeMapping.setCreatedAt(new Date());
             feeMapping = feeMappingRepository.save(feeMapping);
             return feeMapping;
         } catch (Exception e) {
@@ -221,9 +222,6 @@ public class ProductServiceImpl implements ProductService {
 
             purchaseResponses.add(purchaseResponse);
         }
-//        BigDecimal grandAmount = purchaseResponses.stream()
-//                .map(tprice->tprice.getTotalPrice())
-//                    .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal grandAmount = purchaseResponses.stream()
             .map(response -> response.getTotalPrice() == null
@@ -235,7 +233,6 @@ public class ProductServiceImpl implements ProductService {
         grandPurchaseResponse.setPurchaseResponses(purchaseResponses);
         grandPurchaseResponse.setGrandTotal(grandAmount);
 
-//        DefaultResponse<List<PurchaseResponse>> response = new DefaultResponse<>();
         DefaultResponse<GrandPurchaseResponse> response = new DefaultResponse<>();
         response.setStatus(ResponseStatus.SUCCESS.getCode());
         response.setMessage(ResponseStatus.SUCCESS.getMessage());

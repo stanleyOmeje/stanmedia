@@ -31,7 +31,7 @@ import static com.stan.order.util.OrderUtil.validateAmount;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("api/v1/orders")
+@RequestMapping("/api/v1/orders")
 public class OrderController {
 
     private final CustomerClient customerClient;

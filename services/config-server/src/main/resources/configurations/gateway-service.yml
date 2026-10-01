@@ -1,4 +1,17 @@
 spring:
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/stanmedia
+    username: postgres
+    password: stan
+  #    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    database: postgresql
+
   cloud:
     discovery:
       enabled: true
@@ -39,12 +52,21 @@ spring:
               uri: lb://DATA-STORAGE-SERVICE
               predicates:
                 - Path=/api/v1/storage/**
-            - id: profile-service
+            - id: profile-auth-service
               uri: lb://PROFILE-SERVICE
               predicates:
                 - Path=/api/v1/auth/**
+            - id: profile-service
+              uri: lb://PROFILE-SERVICE
+              predicates:
+                - Path=/api/v1/profile/**
 
 
 
 server:
   port: 8222
+
+app:
+  config:
+    authenticate-url: http://localhost:8096/api/v1/profile/authenticate
+

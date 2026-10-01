@@ -37,6 +37,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(
                 request ->
                     request.requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/profile/authenticate").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login").hasAuthority(Role.ADMIN.name())
                         .anyRequest().authenticated()
             )
@@ -65,38 +66,5 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-//        @Bean
-//        SecurityFilterChain securityFilterChain(HttpSecurity http)
-//            throws Exception {
-//
-//            return http
-//                .csrf(AbstractHttpConfigurer::disable)
-//
-//                .sessionManagement(session ->
-//                    session.sessionCreationPolicy(
-//                        SessionCreationPolicy.STATELESS))
-//
-//                .authorizeHttpRequests(auth -> auth
-//
-//                    .requestMatchers(
-//                        "/actuator/health",
-//                        "/swagger-ui/**",
-//                        "/v3/api-docs/**")
-//                    .permitAll()
-//
-//                    .requestMatchers(HttpMethod.GET,
-//                        "/api/profile/me")
-//                    .authenticated()
-//
-//                    .anyRequest()
-//                    .authenticated()
-//                )
-//
-//                .oauth2ResourceServer(oauth ->
-//                    oauth.jwt(Customizer.withDefaults()))
-//
-//                .build();
-//        }
-//
 
 }

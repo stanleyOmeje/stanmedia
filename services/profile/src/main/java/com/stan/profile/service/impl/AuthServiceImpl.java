@@ -81,7 +81,7 @@ public class AuthServiceImpl implements AuthService {
             return response;
         } catch (Exception e) {
             response.setStatus(ResponseStatus.FAILED.getCode());
-            response.setMessage(e.getMessage());
+            response.setMessage(e.getMessage() + " Not Authenticated");
             log.info("Response Inside Exception block AuthServiceImpl::login is ...{}", response);
             return response;
         }
