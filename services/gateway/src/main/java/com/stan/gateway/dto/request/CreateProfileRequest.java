@@ -7,10 +7,12 @@ import lombok.Data;
 
 @Data
 public class CreateProfileRequest {
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String password;
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    private String iPAddress;
+
+//    private String firstName;
+//    private String lastName;
+//    private String email;
+//    private String password;
+//    @Enumerated(EnumType.STRING)
+//    private Role role;
 }

@@ -4,6 +4,8 @@ import com.stan.gateway.enums.Role;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 @Entity
 public class ProfileInfo {
@@ -17,4 +19,7 @@ public class ProfileInfo {
     private String password;
     @Enumerated(EnumType.STRING)
     private Role role;
+    private String iPAddress;
+    private Date createdAt;
+    private Date updatedAt;
 }

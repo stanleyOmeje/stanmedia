@@ -18,9 +18,9 @@ import org.springframework.stereotype.Service;
 public class ProfileServiceImpl implements ProfileService {
     private final ProfileInfoRepository profileInfoRepository;
 
-    public CreateProfileResponse createProfile(AuthenticationData authenticationData) {
+    public CreateProfileResponse createProfile(CreateProfileRequest createProfileRequest, AuthenticationData authenticationData) {
         log.info("Inside Create Profile with authenticationData: {}", authenticationData);
-        ProfileInfo profileInfo = ProfileMapper.mapRequestToProfileInfo(authenticationData);
+        ProfileInfo profileInfo = ProfileMapper.mapRequestToProfileInfo(createProfileRequest, authenticationData);
         try {
             profileInfo = profileInfoRepository.save(profileInfo);
             log.info("Saved Profile: {}", profileInfo);

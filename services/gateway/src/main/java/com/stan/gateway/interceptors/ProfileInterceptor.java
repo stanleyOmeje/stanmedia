@@ -1,11 +1,13 @@
 package com.stan.gateway.interceptors;
 
 import com.google.gson.Gson;
+import com.stan.gateway.dto.request.CreateProfileRequest;
 import com.stan.gateway.dto.response.AuthenticationResponse;
 import com.stan.gateway.dto.response.DefaultResponse;
 import com.stan.gateway.enums.ResponseStatus;
 import com.stan.gateway.service.ProfileService;
 import com.stan.gateway.service.http.ProfileHttp;
+import com.stan.gateway.utils.IpUtil;
 import com.stan.gateway.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -41,6 +43,9 @@ public class ProfileInterceptor implements HandlerInterceptor {
             return true;
         }
 
+        String ip = IpUtil.resolveIp(request);
+        log.info("Caller IP: {}", ip);
+
         String token = request.getHeader("Authorization");
         if (token == null) {
             return buildErrorResponse(response, ResponseStatus.UNAUTHORIZED);
@@ -65,7 +70,9 @@ public class ProfileInterceptor implements HandlerInterceptor {
             return buildErrorResponse(response, ResponseStatus.UNAUTHORIZED);
         }
         try {
-            profileService.createProfile(authResponse.getData());
+            CreateProfileRequest createProfileRequest = new CreateProfileRequest();
+            createProfileRequest.setIPAddress(ip);
+            profileService.createProfile(createProfileRequest,authResponse.getData());
         } catch (Exception e) {
             e.printStackTrace();
         }
