@@ -7,7 +7,9 @@ import com.stan.product.product.dto.request.ProductSearchCriteria;
 import com.stan.product.product.dto.request.PurchaseRequest;
 import com.stan.product.product.dto.request.UpdateProductRequest;
 import com.stan.product.product.dto.response.DefaultResponse;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface ProductService {
@@ -18,4 +20,5 @@ public interface ProductService {
 
     DefaultResponse makePurchase(List<PurchaseRequest> request);
 
+    DefaultResponse createBulkProduct(MultipartFile file) throws IOException;
 }

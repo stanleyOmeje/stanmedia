@@ -7,6 +7,7 @@ import com.stan.product.product.dto.request.ProductSearchCriteria;
 import com.stan.product.product.dto.request.PurchaseRequest;
 import com.stan.product.product.dto.request.UpdateProductRequest;
 import com.stan.product.product.dto.response.DefaultResponse;
+import com.stan.product.product.entity.Product;
 import com.stan.product.product.enums.Belt;
 import com.stan.product.product.enums.FeeType;
 import com.stan.product.product.enums.ProductType;
@@ -15,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.View;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -25,6 +28,8 @@ import java.util.List;
 @RestController
 public class ProductController {
     private final ProductService productService;
+    private final View error;
+
     @PostMapping
     public ResponseEntity<DefaultResponse> createProduct(@RequestBody CreateProductRequest request) {
         log.info("Creating product with name " + request.getName());
@@ -74,4 +79,17 @@ public class ProductController {
         response = productService.makePurchase(request);
         return ResponseEntity.ok(response);
    }
+
+    @PostMapping("/bulk")
+    public ResponseEntity<DefaultResponse<?>> createBulkProduct(@RequestPart MultipartFile file) {
+        try {
+            log.info("Inside createBulkProduct for " + file.getOriginalFilename());
+            DefaultResponse<Product> response = new DefaultResponse<>();
+            response = productService.createBulkProduct(file);
+            return ResponseEntity.ok(response);
+        }catch (Exception e){
+           log.error(e.getMessage());
+            return ResponseEntity.ok(new DefaultResponse("01", e.getMessage()));
+        }
+    }
 }
