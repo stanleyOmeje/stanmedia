@@ -4,6 +4,7 @@ import com.stan.order.dto.response.DefaultResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.Optional;
 
@@ -14,5 +15,6 @@ import java.util.Optional;
 public interface CustomerClient {
 
     @GetMapping("/email/{email}")
-    Optional<DefaultResponse<CustomerResponse>> getCustomerByEmail(@PathVariable("email") String email);
+    Optional<DefaultResponse<CustomerResponse>> getCustomerByEmail(@PathVariable("email") String email,
+                                                                   @RequestHeader("Authorization") String authorization);
 }

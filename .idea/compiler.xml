@@ -14,6 +14,7 @@
         <module name="payment" />
         <module name="gateway" />
         <module name="data-storage" />
+        <module name="account" />
         <module name="order" />
       </profile>
       <profile name="Annotation profile for product" enabled="true">
@@ -30,6 +31,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="account" options="-parameters" />
       <module name="config-server" options="-parameters" />
       <module name="customer" options="-parameters" />
       <module name="data-storage" options="-parameters" />

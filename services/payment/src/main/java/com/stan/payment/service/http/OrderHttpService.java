@@ -26,12 +26,13 @@ public class OrderHttpService {
 
     private final RestTemplate restTemplate;
 
-    public DefaultResponse<OrderResponse> getOrderByReference(String reference) {
+    public DefaultResponse<OrderResponse> getOrderByReference(String reference, String bearerToken) {
         DefaultResponse<OrderResponse> defaultResponse = new DefaultResponse<>();
         try{
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+        headers.set(HttpHeaders.AUTHORIZATION, bearerToken);
         String url = String.format("%s/%s/%s", orderUrl, "order-reference", reference);
         log.info("Inside OrderController::getOrder getting order with url ...{}", url);
         ParameterizedTypeReference<DefaultResponse<OrderResponse>> responseType = new ParameterizedTypeReference<DefaultResponse<OrderResponse>>() {};

@@ -3,6 +3,7 @@ package com.stan.order.enums;
 public enum ResponseStatus {
     SUCCESS("00", "Successful"),
     FAILED("01", "Failed"),
+    PENDING("03", "Pending"),
     NOT_FOUND("100", "Not Found"),
     ALREADY_EXIST("200", "Already Exixt"),
     CREATED("300", "Created"),

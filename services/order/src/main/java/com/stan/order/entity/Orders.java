@@ -1,5 +1,6 @@
 package com.stan.order.entity;
 
+import com.stan.order.enums.OrderStatus;
 import com.stan.order.enums.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,11 +22,19 @@ public class Orders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "idempotency_key", nullable = false, unique = true)
+    private String idempotencyKey;
+
     private String reference;
     private BigDecimal totalPrice;
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
     private String customerEmail;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private OrderStatus status;
+
     @OneToMany
     private List<Orderline> orderline;
     private LocalDateTime createdAt;

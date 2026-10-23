@@ -19,6 +19,7 @@ import com.stan.order.productHelper.ProductHttp;
 import com.stan.order.repository.OrderRepository;
 import com.stan.order.service.OrderService;
 import com.stan.order.service.OrderlineService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -34,76 +35,77 @@ import static com.stan.order.util.OrderUtil.validateAmount;
 @RequestMapping("/api/v1/orders")
 public class OrderController {
 
-    private final CustomerClient customerClient;
-    private final ProductHttp productHttp;
-    private final OrderRepository orderRepository;
-    private final OrderMapper orderMapper;
-    private final OrderlineService orderlineService;
-    private final OrderProducer orderProducer;
     private final OrderService orderService;
-    private final PaymentClient paymentClient;
+
 
 
     @PostMapping
-    public ResponseEntity<DefaultResponse<CreateOrderResponse>> createOrder(@RequestBody OrderRequest request) {
-        DefaultResponse<CreateOrderResponse> response = new DefaultResponse<CreateOrderResponse>();
+    public ResponseEntity<DefaultResponse<CreateOrderResponse>> createOrder(@RequestBody OrderRequest request, HttpServletRequest httpServletRequest) {
         log.info("Inside OrderController::createOrder Creating order with request {}", request);
-
-        //check customer
-        var defaultCustomer = customerClient.getCustomerByEmail(request.email()).orElseThrow(
-            () -> new NotFoundException("01", "Customer not found")
-        );
-        if (!"00".equals(defaultCustomer.getStatus()) || defaultCustomer.getData() == null) {
-            throw new NotFoundException("01", "Customer not found");
-        }
-        var customer = defaultCustomer.getData();
-
-        //purchase product
-        var purchasedProduct = productHttp.purchaseProduct(request.purchaseRequest());
-        //Check totalAmount against sum of items amount
-        if(!validateAmount(purchasedProduct.getData().getGrandTotal(), request.amount())){
-            throw new PaymentMisMatchException(ResponseStatus.PAYMENT_FAILED.getCode(), "Amount MisMatch");
-        }
-        //persist order
-        var order = orderRepository.save(orderMapper.mapOrderRequestToOrder(request));
-
-        //persist orderline
-        for (PurchaseRequest purchaseRequest : request.purchaseRequest()) {
-            OrderlineRequest orderlineRequest = new OrderlineRequest(null,
-                purchaseRequest.productCode(),
-                purchaseRequest.amount(),
-                purchaseRequest.quantity(),
-                purchaseRequest.belt()
-            );
-            orderlineService.createOrderline(orderlineRequest, order);
-        }
-        //start payment
-        PaymentRequest paymentRequest = new PaymentRequest(
-            request.amount(),
-            request.paymentMethod(),
-            order.getId(),
-            order.getReference(),
-            customer
-        );
-        if(!validateAmount(order.getTotalPrice(), request.amount())){
-            throw new PaymentMisMatchException(ResponseStatus.PAYMENT_FAILED.getCode(),
-                ResponseStatus.PAYMENT_FAILED.getMessage());
-        }
-        var paymentResponse = paymentClient.makePayment(paymentRequest);
-        log.info("paymentResponse ...{}", paymentResponse);
-
-        //send order confirmation notification
-        orderProducer.sendOrderConfirmation(new OrderConfirmation(
-            order.getReference(),
-            request.amount(),
-            request.paymentMethod(),
-            customer,
-            purchasedProduct.getData().getPurchaseResponses()
-        ));
-        response.setStatus(ResponseStatus.SUCCESS.getCode());
-        response.setMessage("Order created successfully");
-        response.setData(new CreateOrderResponse(order.getReference()));
+        DefaultResponse<CreateOrderResponse> response = orderService.createOrder(request, httpServletRequest);
+        log.info("response inside OrderController::createOrder is... {}", response);
         return ResponseEntity.ok(response);
+
+//        DefaultResponse<CreateOrderResponse> response = new DefaultResponse<CreateOrderResponse>();
+//        log.info("Inside OrderController::createOrder Creating order with request {}", request);
+//
+//        //check customer
+//        var defaultCustomer = customerClient.getCustomerByEmail(request.email()).orElseThrow(
+//            () -> new NotFoundException("01", "Customer not found")
+//        );
+//        if (!"00".equals(defaultCustomer.getStatus()) || defaultCustomer.getData() == null) {
+//            throw new NotFoundException("01", "Customer not found");
+//        }
+//        var customer = defaultCustomer.getData();
+//
+//        //purchase product
+//        var purchasedProduct = productHttp.purchaseProduct(request.purchaseRequest());
+//        //Check totalAmount against sum of items amount
+//        if(!validateAmount(purchasedProduct.getData().getGrandTotal(), request.amount())){
+//            throw new PaymentMisMatchException(ResponseStatus.PAYMENT_FAILED.getCode(), "Amount MisMatch");
+//        }
+//        //persist order
+//        var order = orderRepository.save(orderMapper.mapOrderRequestToOrder(request));
+//
+//        //persist orderline
+//        for (PurchaseRequest purchaseRequest : request.purchaseRequest()) {
+//            OrderlineRequest orderlineRequest = new OrderlineRequest(null,
+//                purchaseRequest.productCode(),
+//                purchaseRequest.amount(),
+//                purchaseRequest.quantity(),
+//                purchaseRequest.belt()
+//            );
+//            orderlineService.createOrderline(orderlineRequest, order);
+//        }
+//        //start payment
+//        PaymentRequest paymentRequest = new PaymentRequest(
+//            request.amount(),
+//            request.paymentMethod(),
+//            order.getId(),
+//            order.getReference(),
+//            customer
+//        );
+//        if(!validateAmount(order.getTotalPrice(), request.amount())){
+//            throw new PaymentMisMatchException(ResponseStatus.PAYMENT_FAILED.getCode(),
+//                ResponseStatus.PAYMENT_FAILED.getMessage());
+//        }
+//        var paymentResponse = paymentClient.makePayment(paymentRequest);
+//        log.info("paymentResponse ...{}", paymentResponse);
+//
+//        //create transaction
+//
+//        //send order confirmation notification
+//        orderProducer.sendOrderConfirmation(new OrderConfirmation(
+//            order.getReference(),
+//            request.amount(),
+//            request.paymentMethod(),
+//            customer,
+//            purchasedProduct.getData().getPurchaseResponses()
+//        ));
+//        response.setStatus(ResponseStatus.SUCCESS.getCode());
+//        response.setMessage("Order created successfully");
+//        response.setData(new CreateOrderResponse(order.getReference()));
+//        return ResponseEntity.ok(response);
     }
 
     @GetMapping

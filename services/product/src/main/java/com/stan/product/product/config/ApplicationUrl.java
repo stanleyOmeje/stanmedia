@@ -5,5 +5,6 @@ public final class ApplicationUrl {
 
     public static final String PRODUCT_BASE_URL = "/api/v1/products";
     public static final String CATEGORY_BASE_URL = "/api/v1/categories";
+    public static final String TEMPLATE_BASE_URL = "/api/v1/templates";
 
 }

@@ -12,6 +12,7 @@ public record OrderRequest(
     BigDecimal amount,
     PaymentMethod paymentMethod,
     String email,
+    String idempotencyKey,
     List<PurchaseRequest> purchaseRequest
 ) {
 }

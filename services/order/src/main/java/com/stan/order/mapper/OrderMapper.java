@@ -4,6 +4,7 @@ package com.stan.order.mapper;
 import com.stan.order.dto.request.OrderRequest;
 import com.stan.order.dto.response.OrderResponse;
 import com.stan.order.entity.Orders;
+import com.stan.order.enums.OrderStatus;
 import com.stan.order.util.OrderUtil;
 import org.springframework.stereotype.Component;
 
@@ -16,9 +17,11 @@ public class OrderMapper {
        // var order = new Order();
         return Orders.builder()
 //            .reference(request.reference())
+            .idempotencyKey(request.idempotencyKey())
             .reference(OrderUtil.generateReference(request.email()))
             .totalPrice(request.amount())
             .customerEmail(request.email())
+            .status(OrderStatus.PENDING_PAYMENT)
             .paymentMethod(request.paymentMethod())
             .createdAt(LocalDateTime.now())
             .build();

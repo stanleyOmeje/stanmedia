@@ -39,4 +39,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handlePaymentMisMatchException(PaymentMisMatchException ex, WebRequest request){
         return new ResponseEntity<>(new DefaultResponse<>(ex.getCode(),ex.getMessage()),new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler
+    public ResponseEntity<Object> handleDuplicateOrderException(DuplicateOrderException ex, WebRequest request){
+        return new ResponseEntity<>(new DefaultResponse<>(ex.getCode(),ex.getMessage()),new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
 }

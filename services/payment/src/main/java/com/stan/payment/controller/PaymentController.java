@@ -4,6 +4,7 @@ import com.stan.payment.dto.request.PaymentRequest;
 import com.stan.payment.dto.response.CreatePaymentResponse;
 import com.stan.payment.dto.response.DefaultResponse;
 import com.stan.payment.service.PaymentService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,9 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping
-    public ResponseEntity<DefaultResponse<CreatePaymentResponse>> makePayment(@RequestBody PaymentRequest paymentRequest) {
+    public ResponseEntity<DefaultResponse<CreatePaymentResponse>> makePayment(@RequestBody PaymentRequest paymentRequest,
+                                                                              HttpServletRequest httpServletRequest) {
         log.info("Inside PaymentController::makePayment with request: {}", paymentRequest);
-        return ResponseEntity.ok(paymentService.makePayment(paymentRequest));
+        return ResponseEntity.ok(paymentService.makePayment(paymentRequest, httpServletRequest));
     }
 }

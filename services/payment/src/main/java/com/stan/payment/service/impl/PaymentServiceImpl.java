@@ -14,8 +14,10 @@ import com.stan.payment.repository.PaymentRepository;
 import com.stan.payment.service.PaymentService;
 import com.stan.payment.service.http.OrderHttpService;
 import com.stan.payment.util.PaymentUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -29,13 +31,19 @@ public class PaymentServiceImpl implements PaymentService {
     private final OrderHttpService orderHttpService;
 
     @Override
-    public DefaultResponse<CreatePaymentResponse> makePayment(PaymentRequest paymentRequest) {
+    public DefaultResponse<CreatePaymentResponse> makePayment(PaymentRequest paymentRequest, HttpServletRequest httpServletRequest) {
         log.info("Inside PaymentServiceImpl::makePayment with request: {}", paymentRequest);
+        String bearerToken = httpServletRequest.getHeader("Authorization");
+        if (StringUtils.isBlank(bearerToken)) {
+            throw new NotFoundException(ResponseStatus.NOT_FOUND.getCode(),
+                "TOKEN "+ResponseStatus.NOT_FOUND.getMessage());
+        }
         DefaultResponse<CreatePaymentResponse> response = new DefaultResponse<>();
         String paymentReference = null;
         try {
             //Get Order
-            var order = orderHttpService.getOrderByReference(paymentRequest.orderReference());
+            var order = orderHttpService.getOrderByReference(paymentRequest.orderReference(), bearerToken);
+            log.info("Order returned in PaymentServiceImpl::makePayment is... {}", order);
             if (!ResponseStatus.SUCCESS.getCode().equals(order.getStatus())) {
                 throw new NotFoundException(ResponseStatus.NOT_FOUND.getCode(),
                     "ORDER "+ResponseStatus.NOT_FOUND.getMessage());
@@ -68,7 +76,13 @@ public class PaymentServiceImpl implements PaymentService {
                 paymentRequest.customer().lastName(),
                 paymentRequest.customer().email()
             );
-        paymentNotificationProducer.sendPaymentNotification(paymentNotificationRequest);
+        try{
+            paymentNotificationProducer.sendPaymentNotification(paymentNotificationRequest);
+            log.info("Payment notification sent successfully");
+        }catch(Exception e){
+           log.error(e.getMessage());
+        }
+
         response.setStatus(ResponseStatus.SUCCESS.getCode());
         response.setMessage(ResponseStatus.SUCCESS.getMessage());
         response.setData(new CreatePaymentResponse(paymentReference));

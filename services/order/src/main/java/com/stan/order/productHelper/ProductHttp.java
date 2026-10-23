@@ -21,10 +21,11 @@ public class ProductHttp {
     private String url;
     private final RestTemplate restTemplate;
 
-    public DefaultResponse<GrandPurchaseResponse> purchaseProduct(List<PurchaseRequest> request) {
+    public DefaultResponse<GrandPurchaseResponse> purchaseProduct(List<PurchaseRequest> request, String bearerToken) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        headers.set(HttpHeaders.AUTHORIZATION, bearerToken);
         HttpEntity<List<PurchaseRequest>> requestEntity = new HttpEntity<>(request, headers);
         String serviceUrl = String.format("%s/%s", url,"purchase");
 
